@@ -73,13 +73,13 @@ public static void main (String[] args) throws Exception {
    
    
    // Beregn verdi for svart
-	int veiFarge = 0;
+	int svart = 0;
 	for (int i = 0; i<100; i++){
 		fargeLeser.fetchSample(fargeSample, 0);
-		veiFarge += fargeSample[0]* 100;
+		svart += fargeSample[0]* 100;
 	}
-	veiFarge = veiFarge / 100 + 5;
-	System.out.println("Farge: " + veiFarge);
+	svart = svart / 100 + 5;
+	System.out.println("Farge: " + svart);
    
   
  }     // main metode
