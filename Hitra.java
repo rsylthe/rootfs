@@ -29,13 +29,13 @@ import lejos.robotics.SampleProvider;
 import lejos.hardware.sensor.*;
 
 
-public class Golfbane {
+public class Hitra {
 public static void main (String[] args) throws Exception {
    
     Brick brick = Brickfinder.getDefault();
-	Motor.A.setSpeed(500);      // setter hastighet til 500
-	Motor.B.setSpeed(500);      // setter hastighet til 500
-	Motor.C.setSpeed(500);       // vaskemotoren
+	Motor.A.setSpeed(200);      // setter hastighet til 500
+	Motor.B.setSpeed(200);      // setter hastighet til 500
+	Motor.C.setSpeed(300);       // vaskemotoren
 	Port s1 = brick.getPort("S1");  // trykksensor 1  Langs bakken
 	Port s2 = brick.getPort("S2");   // trykksensor 2 Oppe på bilen
 	Port s4 = brick.getPort("S4");   // ultrasoniske sensoren   
@@ -72,7 +72,14 @@ public static void main (String[] args) throws Exception {
    // definerer lydsensor
    
    
-   
+   // Beregn verdi for svart
+	int veiFarge = 0;
+	for (int i = 0; i<100; i++){
+		fargeLeser.fetchSample(fargeSample, 0);
+		veiFarge += fargeSample[0]* 100;
+	}
+	veiFarge = veiFarge / 100 + 5;
+	System.out.println("Farge: " + veiFarge);
    
   
  }     // main metode
