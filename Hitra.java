@@ -35,10 +35,11 @@ public static void main (String[] args) throws Exception {
     Brick brick = Brickfinder.getDefault();
 	Motor.A.setSpeed(500);      // setter hastighet til 500
 	Motor.B.setSpeed(500);      // setter hastighet til 500
-	Motor.C.setSpeed(500);       
+	Motor.C.setSpeed(500);       // vaskemotoren
 	Port s1 = brick.getPort("S1");  // trykksensor 1  Langs bakken
 	Port s2 = brick.getPort("S2");   // trykksensor 2 Oppe på bilen
 	Port s4 = brick.getPort("S4");   // ultrasoniske sensoren   
+	Port s3 = brick.getPort("S3"); // definerer fargesensoren
 	
 	EV3 ev3 = (EV3) Brickfinder.getLocal();
 	TextLCD lcd = ev3.getTextLCD();
