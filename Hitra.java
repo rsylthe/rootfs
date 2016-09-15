@@ -56,7 +56,7 @@ public static void main (String[] args) throws Exception {
  // definerer trykksensor 1
  
    SampleProvider trykksensor1 = new EV3TouchSensor(s1);
-   float[] trykksample1 = new float[trykksensor1.sampleSize()];       // tabell som inneholder avlest verdi
+   float[] trykksample1 = new float[trykksensor1.sampleSize()];       // tabell som inneholder avlest verdi, 
    
  // definerer trykksensor 2
    
