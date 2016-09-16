@@ -30,57 +30,72 @@ import lejos.hardware.sensor.*;
 
 
 public class Hitra {
-public static void main (String[] args) throws Exception {
-   
-    Brick brick = Brickfinder.getDefault();
-	Motor.A.setSpeed(200);      // setter hastighet til 500
-	Motor.B.setSpeed(200);      // setter hastighet til 500
-	Motor.C.setSpeed(300);       // vaskemotoren
-	Port s1 = brick.getPort("S1");  // trykksensor 1  Langs bakken
-	Port s2 = brick.getPort("S2");   // trykksensor 2 Oppe på bilen
-	Port s4 = brick.getPort("S4");   // ultrasoniske sensoren   
-	Port s3 = brick.getPort("S3"); // definerer fargesensoren
-	
-	EV3 ev3 = (EV3) Brickfinder.getLocal();
-	TextLCD lcd = ev3.getTextLCD();
-	Keys keys = ev3.getKeys();
-	
-	lcd.drawString("Trykk for å starte", 0, 1);
-	keys.waitForAnyPress();
-	
-  // definerer fargesensor
-  
-   EV3ColorSensor fargesensor = new EV3ColorSensor(s3); // ev3-fargesensor
-   SampleProvider fargeLeser = fargesensor.getMode("RGB");  // svart = 0.01..	
-   float[] fargeSample = new float [fargeLeser.sampleSize()];  // tabell som inneholder
+	public static void main (String[] args) throws Exception {
+		Brick brick = BrickFinder.getDefault();
+		Motor.A.setSpeed(200);						 // setter hastighet til 500
+		Motor.B.setSpeed(200);						 // setter hastighet til 500
+		Motor.C.setSpeed(300);						 // vaskemotoren
+		Port s1 = brick.getPort("S1");		 // lydsensor
+		Port s2 = brick.getPort("S2");		 // trykksensor 2 Oppe på bilen
+		Port s3 = brick.getPort("S3");		 // definerer fargesensoren
+		//Port s4 = brick.getPort("S4");	 // ultrasoniske sensoren
 
- // definerer trykksensor 1
- 
-   SampleProvider trykksensor1 = new EV3TouchSensor(s1);
-   float[] trykksample1 = new float[trykksensor1.sampleSize()];       // tabell som inneholder avlest verdi, 
-   
- // definerer trykksensor 2
-   
-   SampleProvider trykksensor2 = new EV3TouchSensor(s2);
-   float[] trykksample2 = new float[trykksensor2.sampleSize()];
-   
-   // definerer ultrasensoren
-   EV3UltrasonicSensor ultraSensor = new EV3UltrasonicSensor(s4);
-   SampleProvider ultraLeser = ultraSensor.getDistanceMode();
-   float[] ultraSample = new float[ultraLeser.sampleSize()];    // tabell som inneholder avlest verdi
-   
-   // definerer lydsensor
-   
-   
-   // Beregn verdi for svart
-	int svart = 0;
-	for (int i = 0; i<100; i++){
-		fargeLeser.fetchSample(fargeSample, 0);
-		svart += fargeSample[0]* 100;
-	}
-	svart = svart / 100 + 5;
-	System.out.println("Farge: " + svart);
-   
-  
- }     // main metode
-}     // class
+		EV3 ev3 = (EV3) BrickFinder.getLocal();
+		TextLCD lcd = ev3.getTextLCD();
+		Keys keys = ev3.getKeys();
+
+		lcd.drawString("Trykk for å starte", 0, 1);
+		keys.waitForAnyPress();
+
+		// Definerer fargesensor
+		EV3ColorSensor fargesensor = new EV3ColorSensor(s3); // ev3-fargesensor
+		SampleProvider fargeLeser = fargesensor.getMode("RGB");	// svart = 0.01..
+		float[] fargeSample = new float [fargeLeser.sampleSize()];	// tabell som inneholder
+
+		/*// Definerer trykksensor 1
+		SampleProvider trykksensor1 = new EV3TouchSensor(s1);
+		float[] trykksample1 = new float[trykksensor1.sampleSize()];			 // tabell som inneholder avlest verdi,
+		*/
+
+		// Definerer trykksensor 2
+		SampleProvider trykksensor2 = new EV3TouchSensor(s2);
+		float[] trykksample2 = new float[trykksensor2.sampleSize()];
+
+		/*// Definerer ultrasensoren
+		EV3UltrasonicSensor ultraSensor = new EV3UltrasonicSensor(s4);
+		SampleProvider ultraLeser = ultraSensor.getDistanceMode();
+		float[] ultraSample = new float[ultraLeser.sampleSize()];		// tabell som inneholder avlest verdi
+		*/
+
+		// Definerer lydsensor
+		NXTSoundSensor lydsensor = new NXTSoundSensor(s1);		 // NXT-lydsensor
+		SampleProvider lydInput = lydsensor.getDBAMode();
+		float[] lydSample = new float[lydInput.sampleSize()]; // tabell som inneholder avlest verdi
+
+		/*// Beregn verdi for svart
+		int svart = 0;
+		for (int i = 0; i<100; i++){
+			fargeLeser.fetchSample(fargeSample, 0);
+			svart += fargeSample[0]* 100;
+		}
+		svart = svart / 100 + 5;
+		System.out.println("Farge: " + svart);
+		*/
+
+		boolean fortsett = true;
+
+		while (fortsett) {
+			Motor.A.forward();
+			Motor.B.forward();
+			trykksensor2.fetchSample(trykksample2, 0);
+			lydsensor.fetchSample(lydSample, 0);
+			if (trykksample2[0] > 0) {
+				System.out.println("Avslutter kjøring!");
+				fortsett = false;
+			} else if (lydSample[0] > 0.5) {
+				System.out.println("Lyd: " + lydSample);
+				fortsett = false;
+			}
+		}
+	}		 // main metode
+}		 // class
