@@ -32,12 +32,12 @@ import lejos.hardware.sensor.*;
 public class Hitra {
 	public static void main (String[] args) throws Exception {
 		Brick brick = BrickFinder.getDefault();
-		Motor.A.setSpeed(200);						 // setter hastighet til 500
-		Motor.B.setSpeed(200);						 // setter hastighet til 500
-		Motor.C.setSpeed(300);						 // vaskemotoren
+		Motor.A.setSpeed(150);						 // setter hastighet venstre motor
+		Motor.B.setSpeed(150);						 // setter hastighet høyre motor
+		Motor.C.setSpeed(300);						 // setter hastighet Vaskemotoren
 		Port s1 = brick.getPort("S1");		 // lydsensor
-		Port s2 = brick.getPort("S2");		 // trykksensor 2 Oppe på bilen
-		Port s3 = brick.getPort("S3");		 // definerer fargesensoren
+		Port s2 = brick.getPort("S2");		 // Trykksensor 2 Oppe på bilen
+		Port s3 = brick.getPort("S3");		 // Fargesensoren
 		//Port s4 = brick.getPort("S4");	 // ultrasoniske sensoren
 
 		EV3 ev3 = (EV3) BrickFinder.getLocal();
@@ -47,53 +47,54 @@ public class Hitra {
 		lcd.drawString("Trykk for å starte", 0, 1);
 		keys.waitForAnyPress();
 
-		// Definerer fargesensor
-		EV3ColorSensor fargesensor = new EV3ColorSensor(s3); // ev3-fargesensor
-		SampleProvider fargeLeser = fargesensor.getMode("RGB");	// svart = 0.01..
-		float[] fargeSample = new float [fargeLeser.sampleSize()];	// tabell som inneholder
-
-		/*// Definerer trykksensor 1
-		SampleProvider trykksensor1 = new EV3TouchSensor(s1);
-		float[] trykksample1 = new float[trykksensor1.sampleSize()];			 // tabell som inneholder avlest verdi,
-		*/
-
-		// Definerer trykksensor 2
-		SampleProvider trykksensor2 = new EV3TouchSensor(s2);
-		float[] trykksample2 = new float[trykksensor2.sampleSize()];
-
-		/*// Definerer ultrasensoren
-		EV3UltrasonicSensor ultraSensor = new EV3UltrasonicSensor(s4);
-		SampleProvider ultraLeser = ultraSensor.getDistanceMode();
-		float[] ultraSample = new float[ultraLeser.sampleSize()];		// tabell som inneholder avlest verdi
-		*/
-
-		// Definerer lydsensor
-		NXTSoundSensor lydsensor = new NXTSoundSensor(s1);		 // NXT-lydsensor
+		NXTSoundSensor lydsensor = new NXTSoundSensor(s1);		// Definerer lydsensor
 		SampleProvider lydInput = lydsensor.getDBAMode();
 		float[] lydSample = new float[lydInput.sampleSize()]; // tabell som inneholder avlest verdi
 
-		/*// Beregn verdi for svart
-		int svart = 0;
-		for (int i = 0; i<100; i++){
+		SampleProvider trykksensor = new EV3TouchSensor(s2);	// Definerer trykksensor
+		float[] trykkSample = new float[trykksensor.sampleSize()];
+
+		EV3ColorSensor fargesensor = new EV3ColorSensor(s3);	// Definerer fargesensor
+		SampleProvider fargeLeser = fargesensor.getMode("RGB");	// svart = 0.01..
+		float[] fargeSample = new float [fargeLeser.sampleSize()];	// tabell som inneholder
+
+		// Beregn verdi for svart
+		double svart = 0.05;
+		/*for (int i = 0; i<100; i++){
 			fargeLeser.fetchSample(fargeSample, 0);
 			svart += fargeSample[0]* 100;
 		}
-		svart = svart / 100 + 5;
-		System.out.println("Farge: " + svart);
-		*/
+		svart = svart / 100;
+		System.out.println("Farge før loop: " + svart);*/
 
 		boolean fortsett = true;
+		int retning = 0;
 
 		while (fortsett) {
 			Motor.A.forward();
 			Motor.B.forward();
-			trykksensor2.fetchSample(trykksample2, 0);
+			fargeLeser.fetchSample(fargeSample, 0);
 			lydsensor.fetchSample(lydSample, 0);
-			if (trykksample2[0] > 0) {
-				System.out.println("Avslutter kjøring!");
-				fortsett = false;
-			} else if (lydSample[0] > 0.5) {
-				System.out.println("Lyd: " + lydSample);
+			System.out.println("Farge: " + fargeSample[0]);
+			if (fargeSample[0] < svart){
+				LCD.clear();
+				System.out.println("Fargeakitvert: " + fargeSample[0]);
+				Motor.A.stop();
+				Motor.B.stop();
+				Motor.B.rotate(670);
+				while(Motor.B.isMoving()) Thread.yield();
+			}	else if (lydSample[0] > 1.0) {
+				LCD.clear();
+				System.out.println("Lyd oppdaget!");
+				Motor.A.stop();
+				Motor.B.stop();
+				Thread.sleep(3000);
+			}
+
+			trykksensor.fetchSample(trykkSample, 0);
+			if (trykkSample[0] > 0) {
+				LCD.clear();
+				System.out.println("Avslutter");
 				fortsett = false;
 			}
 		}
